@@ -2,6 +2,7 @@
 
 import { authOptions } from "@/app/api/lib/auth"
 import prisma from "@/prisma/prisma";
+import { sub } from "date-fns";
 import { getServerSession } from "next-auth"
 import { GetServerSideProps } from "next/types";
 
@@ -19,7 +20,7 @@ interface Session {
 
 export async function GetFormStats() {
     const session: Session |  any = await getServerSession(authOptions)
-    console.log(session)
+    //console.log(session)
     if(!session){
         return null
     }
@@ -43,9 +44,17 @@ export async function GetFormStats() {
     const visit = stats._sum.visits || 0;
     const submissions = stats._sum.submissions || 0;
 
+    let submissionRate = 0; 
 
+    if(visit > 0) {
+         submissionRate = (submissions / visit) * 100;
+    }
+
+    const bounceRate= 100 - submissionRate;
     
-    return session
-}
+    return {
+        session, visit, submissionRate, bounceRate, submissions
+}}
+
 
 

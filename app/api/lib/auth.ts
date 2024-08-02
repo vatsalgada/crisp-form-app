@@ -37,7 +37,7 @@ export const authOptions : any= {
     callbacks: {
 
       async session({ session, token }: { session: any; token: JWT }): Promise<Session> {
-        console.log(token)
+        //console.log(token)
         if (session.user && token) {
           session.user.id = token.sub ?? '';
         }

@@ -1,24 +1,20 @@
 "use client"
 
-import React from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog'
-import { BsFileEarmarkPlus } from "react-icons/bs";
-import { ImSpinner10 } from "react-icons/im";
-import { Button } from './ui/button';
-import { DialogDescription } from '@radix-ui/react-dialog';
+import { formSchema, formSchemaType } from '@/schemas/form';
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import {  useForm } from 'react-hook-form';
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
+import { DialogDescription } from '@radix-ui/react-dialog';
+import { useForm } from 'react-hook-form';
+import { ImSpinner2 } from "react-icons/im";
+import { Button } from './ui/button';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
 import { Input } from './ui/input';
-import { Form } from './ui/form'
+import { Textarea } from './ui/textarea';
+import { toast } from './ui/use-toast';
+import { CreateForm } from '@/app/lib/actions/form';
+import { BsFileEarmarkPlus } from "react-icons/bs";
 
-const formSchema = z.object({
-    name: z.string().min(3),
-    description: z.string().optional(),
-})
 
-type formSchemaType = z.infer<typeof formSchema>;
 
 
 
@@ -28,18 +24,42 @@ export default function CreateFormBtn() {
         resolver: zodResolver(formSchema),
     });
 
-    function onSubmit(values: formSchemaType){
-        console.log(values)
+    async function onSubmit(values: formSchemaType){
+        try {
+            const formId = await CreateForm(values);
+            toast({
+                title: "Success",
+                description: "Form created successfully"
+            })
+            console.log(formId)
+            }
+         catch (error) {
+            toast({
+                title: "Error", 
+                description: "Something went wrong, please try again later",
+                variant: "destructive"
+            }
+            )
+        }
     }
   return (
     <div>
       <Dialog>
         <DialogTrigger asChild>
-            <Button>Create new form</Button>
+            <Button 
+            // variant={"outline"}
+            className='group border border-primary/50 bg-transparent ba h-[190px] items-center
+            justify-center flex flex-col hover:scale-95	 hover:cursor-pointer 
+            border-dashed gap-4'>
+                <BsFileEarmarkPlus className='h-8 w-8 text-muted-foreground
+                group-hover:text-white'/>
+                <p className='font-bold text-xl text-slate-400
+                group-hover:text-white'>Create new form</p>
+                
+            </Button>
+            
         </DialogTrigger>
         <DialogContent>
-
-      
         <DialogHeader>
             <DialogTitle>
                 Create form
@@ -75,13 +95,20 @@ export default function CreateFormBtn() {
                                 Description
                             </FormLabel>
                         <FormControl>
-                            <Input {...field } />
+                            <Textarea {...field } />
                         </FormControl>
                         <FormMessage></FormMessage>
                         </FormItem>
    ) }></FormField>
                 </form>
             </Form>
+            <DialogFooter>
+                <Button 
+                onClick={form.handleSubmit(onSubmit)}
+                disabled={form.formState.isSubmitting} className='w-full mt-4'>
+                    {!form.formState.isSubmitting && <span>Save</span> }{
+                        form.formState.isSubmitting && (<ImSpinner2 className='animate-spin' />)}   </Button>
+            </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

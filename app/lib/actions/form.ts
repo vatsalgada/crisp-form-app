@@ -2,6 +2,7 @@
 
 import { authOptions } from "@/app/api/lib/auth"
 import prisma from "@/prisma/prisma";
+import { formSchema, formSchemaType } from "@/schemas/form";
 import { sub } from "date-fns";
 import { getServerSession } from "next-auth"
 import { GetServerSideProps } from "next/types";
@@ -16,17 +17,20 @@ interface Session {
     };
   }
 
-  class UserNotFountErr extends Error {}
+class UserNotFountErr extends Error {}
 
-export async function GetFormStats() {
+async function currentUserId() {
     const session: Session |  any = await getServerSession(authOptions)
     //console.log(session)
     if(!session){
         return null
     }
 
-    const user = JSON.stringify(session.user.id)
+    return JSON.stringify(session.user.id)
+}
 
+export async function GetFormStats() {
+    const user = await currentUserId()
     if(!user) {
         return null
     }
@@ -53,8 +57,54 @@ export async function GetFormStats() {
     const bounceRate= 100 - submissionRate;
     
     return {
-        session, visit, submissionRate, bounceRate, submissions
+      visit, submissionRate, bounceRate, submissions
 }}
 
 
+export async function CreateForm(data:formSchemaType) {
 
+    const validation = formSchema.safeParse(data);
+
+    if(!validation.success){
+        throw new Error("form not valid")
+    }
+
+    const user = await currentUserId();
+    if(!user) {
+        throw new UserNotFountErr();
+    }
+
+    const form = await prisma.form.create(
+        {
+            data: {
+                userId: user,
+                name: data.name,
+                description: data.description
+            }
+        }
+    )
+
+    if(!form){
+        throw new Error("Something went wrong while creating the form")
+    }
+    console.log("Name on server", data.name)
+
+    return form.id
+}
+
+
+export async function  GetForms() {
+    const user = await currentUserId();
+    if(!user){
+        throw new UserNotFountErr(); 
+    }
+
+    return await prisma.form.findMany({
+        where: {
+            userId: user
+        },
+        orderBy: {
+            createdAt: "desc"
+        }
+    })
+}

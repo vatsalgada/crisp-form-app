@@ -7,7 +7,9 @@ export type FormElement = {
     type: ElementsType;
 
     construct: (id: string) => FormElementInstance; 
-    designerComponent: React.FC
+    designerComponent: React.FC<{
+        elementInstance: FormElementInstance
+    }>
     formComponent: React.FC;
     propertiesComponent: React.FC
 
@@ -19,9 +21,9 @@ export type FormElement = {
 }
 
 export type FormElementInstance ={
-    id: String;
+    id: string;
     type: ElementsType;
-    extraAttribute?: Record<string, any>
+    extraAttributes?: Record<string, any>
 }
 
 type FormElementsType = {

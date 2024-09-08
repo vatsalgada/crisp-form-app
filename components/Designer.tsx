@@ -12,9 +12,9 @@ import { Button } from './ui/button'
 
 function Designer() {
 
-    const {elements, addElement} = useDesigner()
+    const {elements, addElement, selectedElement, setSelectedElement} = useDesigner()
 
-   // const [elements, setElements] = useState<FormElementInstance[]>([])
+  // const [elements, setElements] = useState<FormElementInstance[]>([])
     const droppable = useDroppable({
         id: "designer-drop-area",
         data: {
@@ -43,7 +43,12 @@ function Designer() {
     })
   return (
     <div className='flex w-full h-full'>
-      <div className='p-4 w-full'>
+      <div className='p-4 w-full' 
+      onClick={() => {
+        if(selectedElement){
+          setSelectedElement(null);
+        }
+      }}>
         <div 
         ref = {droppable.setNodeRef}
         className={cn('bg-background max-w-[920px] h-full m-auto rounded-xl flex flex-col flex-grow items-center justify-start flex-1 overflow-y-auto',
@@ -52,7 +57,7 @@ function Designer() {
             { !droppable.isOver && elements.length === 0 &&(<p className='text-3xl flex flex-grow items-center font-bold'>
                 Drop here
             </p> )}
-            {droppable.isOver && (
+            {droppable.isOver  && elements.length === 0 && (
               <div className='p-4 w-full'>
                 <div className='h-[120px] rounded-md bg-primary/20'></div>
               </div>
@@ -72,7 +77,7 @@ function Designer() {
 }
 
 function DesignerElementWrapper({element}: {element: FormElementInstance}){
-  const {removeElement} = useDesigner()
+  const {removeElement, selectedElement, setSelectedElement} = useDesigner()
   const [mouseIsOver, setMouseIsOver] = useState<boolean>(false)
   const DesignerElement = FormElements[element.type].designerComponent
   const topHalf = useDroppable({
@@ -103,7 +108,9 @@ function DesignerElementWrapper({element}: {element: FormElementInstance}){
   }
   )
 
-  return <div 
+  if(draggable.isDragging) return null
+
+  return (<div 
   ref ={draggable.setNodeRef}
   {...draggable.listeners}
   {...draggable.attributes}
@@ -114,6 +121,10 @@ function DesignerElementWrapper({element}: {element: FormElementInstance}){
   }}
   onMouseLeave={() => {
     setMouseIsOver(false)
+  }}
+  onClick={(e) => {
+    e.stopPropagation();
+    setSelectedElement(element)
   }}>
   <div ref={topHalf.setNodeRef} className='absolute  w-full h-1/2 rounded-t-md'  ></div>
   <div ref={bottomHalf.setNodeRef} className='absolute w-full bottom-0 h-1/2 rounded-b-md'  ></div>
@@ -123,7 +134,8 @@ function DesignerElementWrapper({element}: {element: FormElementInstance}){
       <Button className='flex justify-center h-full border rounded-md rounded-md rounded-l-none 
       bg-red-500'
       variant={"outline"}
-      onClick={() => {
+      onClick={(e) => {
+        e.stopPropagation();
         removeElement(element.id);
       }}> 
         <BiSolidTrash className='h-6 w-6' />
@@ -133,12 +145,15 @@ function DesignerElementWrapper({element}: {element: FormElementInstance}){
       <p className='text-muted-foreground text-sm'>
         Click for properties or drag to move</p></div></>
   )}
+  {topHalf.isOver && (<div className='absolute w-full top-0 h-[7px] bg-primary/20 rounded-t-md' />)}
   <div className={cn(
-    "flex w-full h-[120px] items-center rounded-md bg-accent/40 px-4 py-2 pointer-events-none",
+    "flex w-full h-[120px] items-center rounded-md bg-accent/40 px-4 py-2 pointer-events-none opacity-100",
      mouseIsOver && "opacity-30")} > 
    <DesignerElement elementInstance={element} />;
 </div>
-</div>
+{bottomHalf.isOver && (<div className='absolute w-full bottom-0 h-[7px] bg-primary/20 rounded-b-md' />)}
+
+</div>)
 }
  
 export default Designer

@@ -1,14 +1,23 @@
 import React from 'react'
 import { FormElements } from './FormElement'
 import SidebarBtnElementDragOverlay from './SidebarBtnElement'
+import useDesigner from './hooks/useDesigner'
+import SidebarBtnElement from './SidebarBtnElement';
+import FormElementsSidebar from './FormElementsSidebar';
+import PropertiesFormSidebar from './PropertiesFormSidebar';
 
 function DesignerSidebar() {
+  const {selectedElement} = useDesigner();
   return (
     <div >
     <aside className='w-[400px] max-w-[400px] flex flex-col
     flex-grow gap-2 border-muted p-4 bg-background overflow-y-auto h-full'>
-    Elements
-    <SidebarBtnElementDragOverlay formElement= {FormElements.TextField} />
+  {!selectedElement && (
+    <FormElementsSidebar />
+  )}
+  {selectedElement && (
+    <PropertiesFormSidebar />
+  )}
     </aside>
     </div>
   )

@@ -19,6 +19,7 @@ interface Session {
 
 class UserNotFountErr extends Error {}
 
+
 async function currentUserId() {
     const session: Session |  any = await getServerSession(authOptions)
     //console.log(session)
@@ -28,6 +29,7 @@ async function currentUserId() {
 
     return JSON.stringify(session.user.id)
 }
+
 
 export async function GetFormStats() {
     const user = await currentUserId()
@@ -122,4 +124,41 @@ export async function GetFormById(id: number) {
             id: id
         }
     })
+}
+
+
+export async function UpdateFormComponent(id: number, jsonContent: string) {
+
+    const user = await currentUserId();
+    
+    if(!user){
+        throw new UserNotFountErr();
+    }
+
+    return await prisma.form.update({
+        where: {
+            userId: user,
+            id: id
+        },
+        data: {
+            content: jsonContent
+        }
+    })
+}
+
+export async function PublishForm(id:number) {
+    const user = await currentUserId();
+    if(!user){
+        throw new UserNotFountErr();
+    }
+
+    return await prisma.form.update({   
+        where: {
+            userId: user,   
+            id: id
+        },  
+        data: { 
+            published: true
+        }
+})
 }

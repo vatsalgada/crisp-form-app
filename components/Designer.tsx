@@ -12,7 +12,7 @@ import { Button } from './ui/button'
 
 function Designer() {
 
-    const {elements, addElement, selectedElement, setSelectedElement} = useDesigner()
+    const {elements, addElement, selectedElement, setSelectedElement, removeElement} = useDesigner()
 
   // const [elements, setElements] = useState<FormElementInstance[]>([])
     const droppable = useDroppable({
@@ -29,18 +29,80 @@ function Designer() {
 
 
            const isDesignerBtnElement = active.data?.current?.isDesignerBtnElement;
-
-           if(isDesignerBtnElement){
+           const isDroppingOverDesignerDropArea = over.data?.current?.isDesignerDropArea;
+          const droppingSidebarBtnOverDesignerDropArea = isDesignerBtnElement && isDroppingOverDesignerDropArea
+           if(droppingSidebarBtnOverDesignerDropArea) {
+            //this drops over the free designer drop space
             const type = active.data?.current?.type;
             const newElement = FormElements[type as ElementsType].construct(
               idGenerator()
             );
-            addElement(0, newElement)
-            console.log("NEW ELEMENT", newElement);
+            addElement(elements.length, newElement)
+            return;
            }
-           console.log("Drag here", event)
-          },
-    })
+
+           const isDroppingOverDesignerElementTopHalf = over.data?.current?.isTopHalfDesignerElement;
+           const isDroppingOverDesignerElementBottomHalf = over.data?.current?.isBottomHalfDesignerElement;
+           const isDroppingOverDesignerElement = isDroppingOverDesignerElementBottomHalf || isDroppingOverDesignerElementTopHalf
+
+           const droppingSidebarBtnOverDesignerElement = isDesignerBtnElement && isDroppingOverDesignerElement
+
+           if(droppingSidebarBtnOverDesignerElement){
+            //this drops between elements
+            const type = active?.data?.current?.type;
+            const newElement = FormElements[type as ElementsType].construct(
+              idGenerator()
+            );
+
+            const overId = over.data?.current?.elementId;
+
+            const overElementIndex = elements.findIndex(el => el.id === overId);
+            if(overElementIndex == -1){
+              throw new Error("element not found, overElemetnIndex missing in designer")
+            }
+            let indexForNewElement = overElementIndex
+            if(isDroppingOverDesignerElementBottomHalf){
+              indexForNewElement += 1
+            }
+            addElement(indexForNewElement, newElement)
+            return;           
+          }
+
+          const isDraggingOverDesignerElement = active.data?.current?.isDesignerElement
+
+          const draggingDesignerElementOverAnotherDesignerElement = (
+            isDroppingOverDesignerElement && isDraggingOverDesignerElement
+          )
+
+          if(draggingDesignerElementOverAnotherDesignerElement){
+            const activeId = active.data?.current?.elementId;
+            const overId = over.data?.current?.elementId;
+
+            const activeElementIndex = elements.findIndex(el => el.id === activeId);
+            if(activeElementIndex == -1){
+              throw new Error("element not found, activeElemetnIndex missing in designer")
+            }
+            
+            const overElementIndex = elements.findIndex(el => el.id === overId);
+            if(overElementIndex == -1){
+              throw new Error("element not found, overElemetnIndex missing in designer")
+            }
+
+            const activeElement = {...elements[activeElementIndex]}
+            removeElement(activeId);
+
+            let indexForNewElement = overElementIndex
+            if(isDroppingOverDesignerElementBottomHalf){
+              indexForNewElement += 1
+            }
+
+            addElement(indexForNewElement, activeElement)
+            return;
+          }
+
+         
+    },
+   })
   return (
     <div className='flex w-full h-full'>
       <div className='p-4 w-full' 
@@ -52,7 +114,7 @@ function Designer() {
         <div 
         ref = {droppable.setNodeRef}
         className={cn('bg-background max-w-[920px] h-full m-auto rounded-xl flex flex-col flex-grow items-center justify-start flex-1 overflow-y-auto',
-          droppable.isOver && "ring-2 ring-primary/20"
+          droppable.isOver && "ring-4 ring-primary/20"
         )}>
             { !droppable.isOver && elements.length === 0 &&(<p className='text-3xl flex flex-grow items-center font-bold'>
                 Drop here
@@ -149,7 +211,7 @@ function DesignerElementWrapper({element}: {element: FormElementInstance}){
   <div className={cn(
     "flex w-full h-[120px] items-center rounded-md bg-accent/40 px-4 py-2 pointer-events-none opacity-100",
      mouseIsOver && "opacity-30")} > 
-   <DesignerElement elementInstance={element} />;
+   <DesignerElement elementInstance={element} />
 </div>
 {bottomHalf.isOver && (<div className='absolute w-full bottom-0 h-[7px] bg-primary/20 rounded-b-md' />)}
 

@@ -3,6 +3,7 @@ import { TextFieldFormElement } from './fields/TextField';
 import { IconType } from 'react-icons/lib';
 
 export type ElementsType = "TextField"
+export type SubmitFunction = (key: string, value: string) => void;
 export type FormElement = {
     type: ElementsType;
 
@@ -11,7 +12,8 @@ export type FormElement = {
         elementInstance: FormElementInstance
     }>
     formComponent: React.FC<{
-        elementInstance: FormElementInstance
+        elementInstance: FormElementInstance;
+        submitValue?: (key: string, value: string) => void;
     }>
     propertiesComponent:  React.FC<{
         elementInstance: FormElementInstance

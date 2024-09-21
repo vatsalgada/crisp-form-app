@@ -1,13 +1,13 @@
 "use client"
 
 import { MdTextFields } from "react-icons/md";
-import { ElementsType, FormElement, FormElementInstance } from "../FormElement"
+import { ElementsType, FormElement, FormElementInstance, SubmitFunction } from "../FormElement"
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useDesigner from "../hooks/useDesigner";
 import {
     Form,
@@ -57,17 +57,25 @@ export const TextFieldFormElement: FormElement = {
 type CustomInstance = FormElementInstance & {
     extraAttributes: typeof extraAttributes
 }
-function FormComponent({elementInstance}: {elementInstance : FormElementInstance}){
+function FormComponent({elementInstance, submitValue}: {elementInstance : FormElementInstance;
+    submitValue?: SubmitFunction}){
 
     const element = elementInstance as CustomInstance;
     const {label, required, placeholder, helperText} = element.extraAttributes
+
+    const [value, setValue] = useState("");
 
  return (<div className="flex flex-col gap-2 w-full">
     <Label>
     {element.extraAttributes?.label}
     {element.extraAttributes.required && "*"}
     </Label>
-    <Input readOnly disabled placeholder={element.extraAttributes.placeHolder} /> 
+    <Input placeholder={element.extraAttributes.placeHolder} onChange={(e) => {setValue(e.target.value)}}
+    onBlur={(e) => {
+        if(!submitValue) return;
+        submitValue(element.id,e.target.value)
+    }}
+    value= {value} /> 
     {helperText && <p className="text-muted-foreground text-[0.8rem]">{helperText}</p>}
 
     </div>)

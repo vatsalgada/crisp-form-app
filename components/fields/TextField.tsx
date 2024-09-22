@@ -19,6 +19,7 @@ import {
     FormMessage
 } from "../ui/form";
 import { Switch } from "../ui/switch";
+import { cn } from "@/lib/utils";
 
 
 const type: ElementsType = "TextField";
@@ -51,32 +52,47 @@ export const TextFieldFormElement: FormElement = {
    designerComponent: DesignerComponent,
    formComponent: FormComponent,
    propertiesComponent: PropertiesComponent,
-
+    validate: (formElement : FormElementInstance, currentValue: string):boolean => {
+        const element = formElement as CustomInstance;
+        if(element.extraAttributes.required){
+            return currentValue.length > 0;
+        }
+        return true;
+    }
 }
 
 type CustomInstance = FormElementInstance & {
     extraAttributes: typeof extraAttributes
 }
-function FormComponent({elementInstance, submitValue}: {elementInstance : FormElementInstance;
-    submitValue?: SubmitFunction}){
+function FormComponent({elementInstance, submitValue, isInvalid}: {elementInstance : FormElementInstance;
+    submitValue?: SubmitFunction; isInvalid?: boolean}){
 
     const element = elementInstance as CustomInstance;
     const {label, required, placeholder, helperText} = element.extraAttributes
 
     const [value, setValue] = useState("");
+    const [error, setError] = useState(false);
+
+    useEffect(() => {
+        setError(isInvalid === true);
+    }, [isInvalid])
 
  return (<div className="flex flex-col gap-2 w-full">
-    <Label>
+    <Label className={cn(error && 'text-red-500')}>
     {element.extraAttributes?.label}
     {element.extraAttributes.required && "*"}
     </Label>
-    <Input placeholder={element.extraAttributes.placeHolder} onChange={(e) => {setValue(e.target.value)}}
+    <Input className={cn(error && 'border-red-500')}
+    placeholder={element.extraAttributes.placeHolder} onChange={(e) => {setValue(e.target.value)}}
     onBlur={(e) => {
         if(!submitValue) return;
+        const valid = TextFieldFormElement.validate(element, e.target.value);
+        setError(!valid);
+        if(!valid) return;
         submitValue(element.id,e.target.value)
     }}
     value= {value} /> 
-    {helperText && <p className="text-muted-foreground text-[0.8rem]">{helperText}</p>}
+    {helperText && <p className={cn("text-muted-foreground text-[0.8rem]", error && 'text-red-500')}>{helperText}</p>}
 
     </div>)
 }

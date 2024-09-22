@@ -14,10 +14,13 @@ export type FormElement = {
     formComponent: React.FC<{
         elementInstance: FormElementInstance;
         submitValue?: (key: string, value: string) => void;
+        isInvlaid?: boolean
     }>
     propertiesComponent:  React.FC<{
         elementInstance: FormElementInstance
     }>
+
+    validate: (formElement : FormElementInstance, currentValue: string) => boolean;
 
     designerBtnElement: {
         icon: React.ElementType,

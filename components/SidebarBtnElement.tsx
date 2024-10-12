@@ -9,7 +9,7 @@ function SidebarBtnElement({ formElement} : {
 }) {
     const {label, icon: Icon} = formElement.designerBtnElement;
     const draggable = useDraggable({
-        id: "designer-btn-${formElement.type}",
+        id: `designer-btn-${formElement.type}`,
         data:{
             type: formElement.type,
             isDesignerBtnElement: true,

@@ -1,8 +1,10 @@
 import React from 'react'
 import { TextFieldFormElement } from './fields/TextField';
 import { IconType } from 'react-icons/lib';
+import { TitleFieldFormElement } from './fields/TitleField';
+import { SubtitleFieldFormElement } from './fields/SubTitleField';
 
-export type ElementsType = "TextField"
+export type ElementsType = "TextField" | "TitleField" | "SubTitleField";
 export type SubmitFunction = (key: string, value: string) => void;
 export type FormElement = {
     type: ElementsType;
@@ -14,7 +16,8 @@ export type FormElement = {
     formComponent: React.FC<{
         elementInstance: FormElementInstance;
         submitValue?: (key: string, value: string) => void;
-        isInvlaid?: boolean
+        isInvlaid?: boolean;
+        defaultValue?: string
     }>
     propertiesComponent:  React.FC<{
         elementInstance: FormElementInstance
@@ -47,5 +50,7 @@ export type FormElementsType = {
 
 export const FormElements: FormElementsType = {
     TextField: TextFieldFormElement,
+    TitleField: TitleFieldFormElement,
+    SubTitleField: SubtitleFieldFormElement
 }
 

@@ -63,9 +63,9 @@ export const authOptions : any= {
       },
     },
    
-    // pages: {
-    //     signIn: '/signin',
-    // }
+    pages: {
+        signIn: '/signin',
+    }
   }
 
 

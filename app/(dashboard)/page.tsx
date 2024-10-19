@@ -1,6 +1,8 @@
+
+
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { GetForms, GetFormStats } from "../lib/actions/form";
+import { currentUserId, GetForms, GetFormStats } from "../lib/actions/form";
 import { LuView } from "react-icons/lu";
 import { FaWpforms } from "react-icons/fa";
 import { HiCursorClick } from "react-icons/hi";
@@ -16,9 +18,16 @@ import { Form } from "@prisma/client";
 import { Badge } from "@/components/ui/badge";
 import { formatDistance } from "date-fns";
 import Link from "next/link";
+import { redirect } from 'next/navigation'
 
 
-export default function Home() {
+
+
+export default async function Home() {
+  const user = await currentUserId()
+  if(!user){
+    redirect(`api/auth/signin`)
+    return (<div>No user</div>)}
   return (
     <div className="container pt-4">
     <Suspense fallback={<StatsCards loading={true} />}>
@@ -136,7 +145,7 @@ async function FormCards(){
 
 
 function FormCard({form}: {form: Form}) {
-  console.log(form.name)
+  //console.log(form.name);
   return (
     <Card>
       <CardHeader>

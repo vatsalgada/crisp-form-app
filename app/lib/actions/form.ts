@@ -6,6 +6,7 @@ import { formSchema, formSchemaType } from "@/schemas/form";
 import { sub } from "date-fns";
 import { getServerSession } from "next-auth"
 import { GetServerSideProps } from "next/types";
+import { redirect } from 'next/navigation';
 
 
 interface Session {
@@ -20,10 +21,11 @@ interface Session {
 class UserNotFountErr extends Error {}
 
 
-async function currentUserId() {
+export async function currentUserId() {
     const session: Session |  any = await getServerSession(authOptions)
     //console.log(session)
     if(!session){
+       // redirect('/api/auth/signin');
         return null
     }
 

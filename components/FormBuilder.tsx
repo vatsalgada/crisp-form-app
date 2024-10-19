@@ -18,7 +18,7 @@ import { BsArrowLeft, BsArrowRight } from 'react-icons/bs'
 import Confetti from "react-confetti"
 
 function FormBuilder({form} : {form: Form}) {
-  const {setElements} = useDesigner();
+  const {setElements, setSelectedElement} = useDesigner();
   const  [isReady, setIsReady] = useState(false);
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
@@ -35,6 +35,7 @@ function FormBuilder({form} : {form: Form}) {
   const sensors = useSensors(mouseSensor, touchSensor)
 
   useEffect(() => {
+    setSelectedElement(null);
     if(isReady) return;
     const elements = JSON.parse(form.content);
     setElements(elements);

@@ -2,11 +2,11 @@
 
 import { formSchema, formSchemaType } from '@/schemas/form';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DialogDescription } from '@radix-ui/react-dialog';
+//import { DialogDescription } from '@radix-ui/react-dialog';
 import { useForm } from 'react-hook-form';
 import { ImSpinner2 } from "react-icons/im";
 import { Button } from './ui/button';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
+import { Dialog, DialogContent,DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';

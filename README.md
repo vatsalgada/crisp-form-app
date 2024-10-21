@@ -1,5 +1,7 @@
 ##Welcome to KrispForm ( https://krispform.vercel.app )
 
+(Currently, this application is designed to be used on Desktop)
+
 KrispForm is a form-builder application that's been a labor of love for me. As a developer, I've always been passionate about creating user-friendly and efficient solutions, and this project is no exception.
 
 #What's This Project About?

@@ -70,7 +70,7 @@ function FormComponent({elementInstance, submitValue, isInvalid, defaultValue}: 
     const element = elementInstance as CustomInstance;
     const {label, required, placeholder, helperText} = element.extraAttributes
 
-    const [value, setValue] = useState("" || defaultValue);
+    const [value, setValue] = useState(defaultValue || "");
     const [error, setError] = useState(false);
 
     useEffect(() => {
